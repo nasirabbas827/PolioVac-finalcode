@@ -12,11 +12,11 @@ $user_id = $_SESSION["id"];
 $upload_error = $update_msg = "";
 
 // Fetch user info
-$sql = "SELECT username, email, age, bio, profile_picture FROM users WHERE id = ?";
+$sql = "SELECT username, email, age, bio, profile_picture, cnic FROM users WHERE id = ?";
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $user_id);
 mysqli_stmt_execute($stmt);
-mysqli_stmt_bind_result($stmt, $username, $email, $age, $bio, $profile_picture);
+mysqli_stmt_bind_result($stmt, $username, $email, $age, $bio, $profile_picture, $cnic);
 mysqli_stmt_fetch($stmt);
 mysqli_stmt_close($stmt);
 
@@ -26,6 +26,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $newEmail = trim($_POST["email"]);
     $newAge = intval($_POST["age"]);
     $newBio = trim($_POST["bio"]);
+    $newCnic = trim($_POST["cnic"]);
+
+    // Validate CNIC
+    if (!preg_match('/^\d{13}$/', $newCnic)) {
+        $upload_error = "CNIC must be exactly 13 digits.";
+    }
 
     // Handle profile picture upload
     if (!empty($_FILES["profile_picture"]["name"])) {
@@ -46,22 +52,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Update query
-    $update_query = "UPDATE users SET username = ?, email = ?, age = ?, bio = ?, profile_picture = ? WHERE id = ?";
-    $update_stmt = mysqli_prepare($conn, $update_query);
-    mysqli_stmt_bind_param($update_stmt, "ssissi", $newUsername, $newEmail, $newAge, $newBio, $profile_picture, $user_id);
+    // Proceed only if no CNIC error
+    if (empty($upload_error)) {
+        $update_query = "UPDATE users SET username = ?, email = ?, age = ?, bio = ?, profile_picture = ?, cnic = ? WHERE id = ?";
+        $update_stmt = mysqli_prepare($conn, $update_query);
+        mysqli_stmt_bind_param($update_stmt, "ssisssi", $newUsername, $newEmail, $newAge, $newBio, $profile_picture, $newCnic, $user_id);
 
-    if (mysqli_stmt_execute($update_stmt)) {
-        $update_msg = '<div class="alert alert-success">Profile updated successfully.</div>';
-        $username = $newUsername;
-        $email = $newEmail;
-        $age = $newAge;
-        $bio = $newBio;
-    } else {
-        $update_msg = '<div class="alert alert-danger">Error updating profile: ' . mysqli_error($conn) . '</div>';
+        if (mysqli_stmt_execute($update_stmt)) {
+            $update_msg = '<div class="alert alert-success">Profile updated successfully.</div>';
+            $username = $newUsername;
+            $email = $newEmail;
+            $age = $newAge;
+            $bio = $newBio;
+            $cnic = $newCnic;
+        } else {
+            $update_msg = '<div class="alert alert-danger">Error updating profile: ' . mysqli_error($conn) . '</div>';
+        }
+
+        mysqli_stmt_close($update_stmt);
     }
 
-    mysqli_stmt_close($update_stmt);
+    mysqli_close($conn);
 }
 ?>
 
@@ -98,6 +109,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="number" class="form-control" name="age" value="<?php echo htmlspecialchars($age); ?>" required>
                 </div>
                 <div class="form-group">
+                    <label>CNIC:</label>
+                    <input type="text" class="form-control" name="cnic" maxlength="13" value="<?php echo htmlspecialchars($cnic); ?>" required>
+                </div>
+                <div class="form-group">
                     <label>Bio:</label>
                     <textarea class="form-control" name="bio" rows="3"><?php echo htmlspecialchars($bio); ?></textarea>
                 </div>
@@ -114,6 +129,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 </body>
 </html>
-
-
-

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 29, 2025 at 08:52 AM
+-- Generation Time: Aug 01, 2025 at 06:31 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -136,6 +136,7 @@ CREATE TABLE `users` (
   `email` varchar(100) NOT NULL,
   `phone` varchar(20) NOT NULL,
   `age` int(11) DEFAULT NULL,
+  `cnic` varchar(13) NOT NULL,
   `bio` text DEFAULT NULL,
   `user_type` varchar(50) DEFAULT NULL,
   `profile_picture` varchar(255) DEFAULT NULL,
@@ -146,9 +147,9 @@ CREATE TABLE `users` (
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `email`, `phone`, `age`, `bio`, `user_type`, `profile_picture`, `status`) VALUES
-(1, 'worker12', '$2y$10$gps/vTvTY1t1FGWgealP8.zmrT0NUXQCBKVorMsz7X0Mrjo5sO.km', 'worker@gmail.com', '3176526827', 23, NULL, 'Worker', NULL, 'approved'),
-(2, 'parent1', '$2y$10$OnwDThbrX/FOiMGixb5QHOFPLRf89npIHBpwRvxF1tJHxRY8PNAMq', 'parent@gmail.com', '03120558064', 23, NULL, 'Parent', NULL, 'approved');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `phone`, `age`, `cnic`, `bio`, `user_type`, `profile_picture`, `status`) VALUES
+(1, 'worker12', '$2y$10$gps/vTvTY1t1FGWgealP8.zmrT0NUXQCBKVorMsz7X0Mrjo5sO.km', 'worker@gmail.com', '3176526827', 23, '3240284436399', 'ds', 'Worker', 'images/1754022562_504-1.jpg', 'approved'),
+(2, 'parent1', '$2y$10$OnwDThbrX/FOiMGixb5QHOFPLRf89npIHBpwRvxF1tJHxRY8PNAMq', 'parent@gmail.com', '03120558064', 23, '3240254008217', 'noe', 'Parent', 'images/1754022511_3.png', 'approved');
 
 -- --------------------------------------------------------
 

@@ -2,8 +2,8 @@
 include('config.php');
 
 // Define variables and initialize with empty values
-$username = $password = $email = $phone = $age = $user_type = "";
-$username_err = $password_err = $email_err = $phone_err = $age_err = $user_type_err = "";
+$username = $password = $email = $phone = $age = $user_type = $cnic = "";
+$username_err = $password_err = $email_err = $phone_err = $age_err = $user_type_err = $cnic_err = "";
 $registration_msg = "";
 
 // Check if form is submitted
@@ -80,6 +80,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
+    // Validate CNIC
+    if (empty(trim($_POST["cnic"]))) {
+        $cnic_err = "Please enter your CNIC.";
+    } else {
+        $cnic = trim($_POST["cnic"]);
+        if (!preg_match('/^\d{13}$/', $cnic)) {
+            $cnic_err = "CNIC must be exactly 13 digits.";
+        }
+    }
+
     // Validate user type
     if (empty(trim($_POST["user_type"]))) {
         $user_type_err = "Please select a user type.";
@@ -88,16 +98,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // If no errors, insert user into database
-    if (empty($username_err) && empty($password_err) && empty($email_err) && empty($phone_err) && empty($age_err) && empty($user_type_err)) {
-        $sql = "INSERT INTO users (username, password, email, phone, age, user_type, status) VALUES (?, ?, ?, ?, ?, ?, 'pending')";
+    if (empty($username_err) && empty($password_err) && empty($email_err) && empty($phone_err) && empty($age_err) && empty($user_type_err) && empty($cnic_err)) {
+        $sql = "INSERT INTO users (username, password, email, phone, age, cnic, user_type, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "ssssss", $param_username, $param_password, $param_email, $param_phone, $param_age, $param_user_type);
+        mysqli_stmt_bind_param($stmt, "sssssss", $param_username, $param_password, $param_email, $param_phone, $param_age, $param_cnic, $param_user_type);
 
         $param_username = $username;
         $param_password = password_hash($password, PASSWORD_DEFAULT);
         $param_email = $email;
         $param_phone = $phone;
         $param_age = $age;
+        $param_cnic = $cnic;
         $param_user_type = $user_type;
 
         if (mysqli_stmt_execute($stmt)) {
@@ -123,48 +134,63 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 <?php include('navbar.php'); ?>
 <div class="container mt-5">
-    <div class="card mx-auto" style="max-width: 500px;">
+    <div class="card mx-auto" style="max-width: 800px;">
         <div class="card-body">
             <h2 class="text-center">User Registration</h2>
             <p class="text-center">Please fill in your details to register.</p>
 
-            <!-- Display Registration Message -->
             <?php echo $registration_msg; ?>
 
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                    <span class="invalid-feedback"><?php echo $username_err; ?></span>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Username</label>
+                        <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
+                        <span class="invalid-feedback"><?php echo $username_err; ?></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Phone Number</label>
+                        <input type="number" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
+                        <span class="invalid-feedback"><?php echo $phone_err; ?></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="number" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
-                    <span class="invalid-feedback"><?php echo $phone_err; ?></span>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Email</label>
+                        <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>">
+                        <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>Password</label>
+                        <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
+                        <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>">
-                    <span class="invalid-feedback"><?php echo $email_err; ?></span>
+
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label>Age</label>
+                        <input type="number" name="age" class="form-control <?php echo (!empty($age_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $age; ?>">
+                        <span class="invalid-feedback"><?php echo $age_err; ?></span>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>CNIC</label>
+                        <input type="text" name="cnic" maxlength="13" class="form-control <?php echo (!empty($cnic_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $cnic; ?>">
+                        <span class="invalid-feedback"><?php echo $cnic_err; ?></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
-                    <span class="invalid-feedback"><?php echo $password_err; ?></span>
+
+                <div class="form-row">
+                    <div class="form-group col-md-12">
+                        <label>User Type</label>
+                        <select name="user_type" class="form-control <?php echo (!empty($user_type_err)) ? 'is-invalid' : ''; ?>">
+                            <option value="">Select user type</option>
+                            <option value="Parent" <?php echo ($user_type == "Parent") ? 'selected' : ''; ?>>Parent</option>
+                        </select>
+                        <span class="invalid-feedback"><?php echo $user_type_err; ?></span>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Age</label>
-                    <input type="number" name="age" class="form-control <?php echo (!empty($age_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $age; ?>">
-                    <span class="invalid-feedback"><?php echo $age_err; ?></span>
-                </div>
-                <div class="form-group">
-    <label>User Type</label>
-    <select name="user_type" class="form-control <?php echo (!empty($user_type_err)) ? 'is-invalid' : ''; ?>">
-        <option value="">Select user type</option>
-        <option value="Parent" <?php echo ($user_type == "Parent") ? 'selected' : ''; ?>>Parent</option>
-    </select>
-    <span class="invalid-feedback"><?php echo $user_type_err; ?></span>
-</div>
 
                 <div class="form-group text-center">
                     <input type="submit" class="btn btn-primary" value="Register">
@@ -174,4 +200,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </div>
 </body>
+
 </html>

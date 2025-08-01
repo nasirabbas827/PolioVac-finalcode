@@ -40,6 +40,7 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Age</th>
+                <th>CNIC</th>
                 <th>Bio</th>
                 <th>User Type</th>
                 <th>Status</th>
@@ -54,6 +55,7 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
                 <td><?= htmlspecialchars($row['email']) ?></td>
                 <td><?= htmlspecialchars($row['phone']) ?></td>
                 <td><?= htmlspecialchars($row['age']) ?></td>
+                <td><?= htmlspecialchars($row['cnic']) ?></td>
                 <td><?= htmlspecialchars($row['bio']) ?></td>
                 <td><?= htmlspecialchars($row['user_type']) ?></td>
                 <td>
@@ -66,7 +68,7 @@ $result = mysqli_query($conn, "SELECT * FROM users ORDER BY id DESC");
                 </td>
                 <td>
                     <a href="edit_user.php?id=<?= $row['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete user?')" class="btn btn-sm btn-danger">Delete</a>
+                    <a href="?delete=<?= $row['id'] ?>" onclick="return confirm('Delete user?')" class="mt-2 btn btn-sm btn-danger">Delete</a>
                 </td>
             </tr>
         <?php endwhile; ?>
