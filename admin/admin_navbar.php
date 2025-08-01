@@ -18,6 +18,12 @@
       <li class="nav-item ">
         <a class="nav-link" href="add_schedule.php">Schedule</a>
       </li>      
+      <li class="nav-item ">
+        <a class="nav-link" href="view_vaccination_status.php">Vaccination Record</a>
+      </li>      
+      <li class="nav-item ">
+        <a class="nav-link" href="reports.php">Reports</a>
+      </li>      
       <li class="nav-item">
         <a class="nav-link" href="logout.php">Logout</a>
       </li>
